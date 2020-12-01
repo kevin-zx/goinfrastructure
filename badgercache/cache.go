@@ -21,6 +21,7 @@ type BadgerCache interface {
 	SavesWithPrefix(eds []EntryData, prefix string) error
 	Gets(keys []string) ([]EntryData, []string, error)
 	GetsWithPrefix(keys []string, prefix string) ([]EntryData, []string, error)
+	DeleteWithPrefix(keys []string, prefix string) error
 	Delete(keys []string) error
 	Close() error
 }
@@ -39,6 +40,10 @@ func NewBadgerCache(dbPath string) (BadgerCache, error) {
 //bc *badgercache badgercache.BadgerCache
 type badgercache struct {
 	db *badger.DB
+}
+
+func (bc *badgercache) DeleteWithPrefix(keys []string, prefix string) error {
+	return bc.Delete(assemblePrefixFromKeys(keys, prefix))
 }
 
 func (bc *badgercache) SavesWithPrefix(eds []EntryData, prefix string) error {
