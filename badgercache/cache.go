@@ -106,7 +106,9 @@ func (bc *badgercache) Saves(eds []EntryData) error {
 				e = e.WithMeta(ed.Meta)
 			}
 			err := txn.SetEntry(e)
-			return err
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	})
