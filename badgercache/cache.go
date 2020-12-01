@@ -1,6 +1,7 @@
 package badgercache
 
 import (
+	"strings"
 	"time"
 
 	badger "github.com/dgraph-io/badger/v2"
@@ -17,7 +18,9 @@ type EntryData struct {
 // BadgerCache 是一个基于Badger作为底层的文件缓存
 type BadgerCache interface {
 	Saves([]EntryData) error
+	SavesWithPrefix(eds []EntryData, prefix string) error
 	Gets(keys []string) ([]EntryData, []string, error)
+	GetsWithPrefix(keys []string, prefix string) ([]EntryData, []string, error)
 	Delete(keys []string) error
 	Close() error
 }
@@ -33,8 +36,58 @@ func NewBadgerCache(dbPath string) (BadgerCache, error) {
 	return &dc, nil
 }
 
+//bc *badgercache badgercache.BadgerCache
 type badgercache struct {
 	db *badger.DB
+}
+
+func (bc *badgercache) SavesWithPrefix(eds []EntryData, prefix string) error {
+	eds = assemblePrefixFromEntryData(eds, prefix)
+	return bc.Saves(eds)
+}
+
+func assemblePrefixFromKeys(ks []string, prefix string) []string {
+	var keyWithPrefix []string
+	for _, k := range ks {
+		keyWithPrefix = append(keyWithPrefix, prefix+"_"+k)
+	}
+	return keyWithPrefix
+}
+
+func disassemblePrefixFromKeys(ks []string, prefix string) []string {
+	var keyWithoutPrefix []string
+	for _, k := range ks {
+		keyWithoutPrefix = append(keyWithoutPrefix, strings.Replace(k, prefix+"_", "", 1))
+	}
+	return keyWithoutPrefix
+
+}
+
+func assemblePrefixFromEntryData(eds []EntryData, prefix string) []EntryData {
+	for i := range eds {
+		eds[i].Key = prefix + "_" + eds[i].Key
+	}
+	return eds
+}
+
+func disassemblePrefixFromEntryData(eds []EntryData, prefix string) []EntryData {
+	for i := range eds {
+		eds[i].Key = strings.Replace(eds[i].Key, prefix+"_", "", 1)
+		// keyWithoutPrefix = append(keyWithoutPrefix, strings.Replace(k, prefix+"_", "", 1))
+	}
+	return eds
+
+}
+
+func (bc *badgercache) GetsWithPrefix(keys []string, prefix string) ([]EntryData, []string, error) {
+	kwp := assemblePrefixFromKeys(keys, prefix)
+	eds, ss, err := bc.Gets(kwp)
+	if err != nil {
+		return nil, nil, err
+	}
+	miskeys := disassemblePrefixFromKeys(ss, prefix)
+	eds = disassemblePrefixFromEntryData(eds, prefix)
+	return eds, miskeys, nil
 }
 
 func (bc *badgercache) Saves(eds []EntryData) error {
