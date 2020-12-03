@@ -22,6 +22,7 @@ type BadgerCache interface {
 	Gets(keys []string) ([]EntryData, []string, error)
 	GetsWithPrefix(keys []string, prefix string) ([]EntryData, []string, error)
 	DeleteWithPrefix(keys []string, prefix string) error
+	ScanKeysByPrefix(prefix string) ([]string, error)
 	Delete(keys []string) error
 	Close() error
 }
@@ -40,6 +41,22 @@ func NewBadgerCache(dbPath string) (BadgerCache, error) {
 //bc *badgercache badgercache.BadgerCache
 type badgercache struct {
 	db *badger.DB
+}
+
+func (bc *badgercache) ScanKeysByPrefix(prefix string) ([]string, error) {
+	var keys []string
+	err := bc.db.View(func(txn *badger.Txn) error {
+		it := txn.NewIterator(badger.DefaultIteratorOptions)
+		defer it.Close()
+		prefixRaw := []byte(prefix)
+		for it.Seek(prefixRaw); it.ValidForPrefix(prefixRaw); it.Next() {
+			item := it.Item()
+			k := item.Key()
+			keys = append(keys, string(k))
+		}
+		return nil
+	})
+	return keys, err
 }
 
 func (bc *badgercache) DeleteWithPrefix(keys []string, prefix string) error {
