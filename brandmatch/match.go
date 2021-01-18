@@ -16,6 +16,25 @@ type BrandName struct {
 	gen      bool
 }
 
+// SetMainName 设置品牌展示名称
+func (b *BrandName) SetMainName() {
+	b.MainName = ""
+	sort.Slice(b.CNNames, func(i, j int) bool {
+		return len(b.CNNames[i]) > len(b.CNNames[j])
+	})
+	if len(b.CNNames) > 0 {
+		b.MainName += b.CNNames[0]
+	}
+	if len(b.ENNames) > 0 {
+		if len(b.MainName) == 0 {
+			b.MainName = b.ENNames[0]
+		} else {
+			b.MainName += " (" + b.ENNames[0] + ")"
+		}
+
+	}
+}
+
 func (b *BrandName) genMatch() {
 	if b.gen {
 		return
