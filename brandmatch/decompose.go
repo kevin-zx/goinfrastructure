@@ -13,7 +13,7 @@ func DecomposeBrands(rawBrands []string) ([]BrandName, error) {
 	if err != nil {
 		return nil, err
 	}
-	fBrands = combination(fBrands)
+	fBrands = CombinationBrands(fBrands)
 	for i := range fBrands {
 		fBrands[i].SetMainName()
 	}
@@ -77,7 +77,7 @@ func split(rb string) []string {
 	return []string{rb}
 }
 
-func combination(bs []BrandName) []BrandName {
+func CombinationBrands(bs []BrandName) []BrandName {
 	nBrands := []BrandName{}
 	for i := len(bs) - 1; i >= 0; i-- {
 		if bs[i].MainName == "" {
