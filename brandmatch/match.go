@@ -85,22 +85,28 @@ func (b *BrandName) Match(txt string, products []string, properties []string) bo
 
 	for _, match := range b.enMatch {
 		if strings.Contains(txt, match) {
-			m = matchPart(products, properties, txt, match, true)
-			if m {
+			if len(products) != 0 || len(properties) != 0 {
+				m = matchPart(products, properties, txt, match, true)
+				if m {
+					return true
+				}
+			} else {
 				return true
 			}
 		}
-
 	}
 
 	for _, match := range b.cnMatch {
 		if strings.Contains(txt, match) {
-			m = matchPart(products, properties, txt, match, true)
-			if m {
+			if len(products) != 0 || len(properties) != 0 {
+				m = matchPart(products, properties, txt, match, true)
+				if m {
+					return true
+				}
+			} else {
 				return true
 			}
 		}
-
 	}
 	return false
 }
