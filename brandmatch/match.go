@@ -136,6 +136,7 @@ func matchPart(products, shoulds []string, txt, match string, isEN bool) bool {
 }
 
 func matchSingleString(txt string, product string, match string, distance int, isEn bool) bool {
+	txt = strings.ReplaceAll(txt, " ", "")
 	ts := strings.Split(txt, match)
 	if len(ts) == 0 {
 		return false
