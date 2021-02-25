@@ -206,6 +206,10 @@ func matchBrandAndProduct(txt string, brand string, product string, productMinDi
 	var pe bool
 	for i, t := range ts {
 		trs := []rune(t)
+		if len(trs) == 0 {
+			pe = false
+			continue
+		}
 		if isEn {
 			if i == 0 {
 				//第一行 不做判断，第二行才能判断英文是完整的
