@@ -1,8 +1,6 @@
 package brandmatch
 
 import (
-	"fmt"
-	"log"
 	"sort"
 	"strings"
 	"unicode"
@@ -197,7 +195,7 @@ func matchSingleString(txt string, product string, match string, distance int, i
 func matchBrandAndProduct(txt string, brand string, product string, productMinDistance int, isEn bool) (brandMatch bool, productMatch bool) {
 	txt = strings.ReplaceAll(txt, " ", "")
 	ts := strings.Split(txt, brand)
-	log.Printf("%s\n", strings.Join(ts, "-----------"))
+	// log.Printf("%s\n", strings.Join(ts, "-----------"))
 	if len(ts) == 0 {
 		return false, false
 	}
@@ -296,7 +294,7 @@ func isDistanceOK(t, p string, distance int, start bool, end bool) bool {
 		return true
 	}
 	left, right := getDistance(t, p)
-	fmt.Printf("%d %d \n", left, right)
+	// fmt.Printf("%d %d \n", left, right)
 
 	if left == -1 || right == -1 {
 		return false
