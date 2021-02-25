@@ -6,8 +6,8 @@ type BrandMatch interface {
 	MatchAll(txt string, products []string, properties []string) []MatchInfo
 }
 type MatchInfo struct {
-	brand        string
-	productMatch bool
+	Brand        string
+	ProductMatch bool
 }
 
 type brandMatch struct {
@@ -43,8 +43,8 @@ func (bm *brandMatch) MatchAll(txt string, products []string, properties []strin
 
 		if mb && mp {
 			mis = append(mis, MatchInfo{
-				brand:        b.MainName,
-				productMatch: mp,
+				Brand:        b.MainName,
+				ProductMatch: mp,
 			})
 			continue
 		}
@@ -57,16 +57,16 @@ func (bm *brandMatch) MatchAll(txt string, products []string, properties []strin
 			}
 		}
 		if mb {
-			mi := MatchInfo{brand: b.MainName}
+			mi := MatchInfo{Brand: b.MainName}
 			if mp {
-				mi.productMatch = true
+				mi.ProductMatch = true
 			}
 			mis = append(mis, mi)
 		}
 	}
 	var restulstMatchInfos []MatchInfo
 	for _, mi := range mis {
-		if mi.productMatch {
+		if mi.ProductMatch {
 			restulstMatchInfos = append(restulstMatchInfos, mi)
 		}
 	}
