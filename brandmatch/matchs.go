@@ -3,7 +3,7 @@ package brandmatch
 import "strings"
 
 type BrandMatch interface {
-	MatchAll(txt string, products []string, properties []string) []BrandName
+	MatchAll(txt string, products []string, properties []string) []MatchInfo
 }
 type MatchInfo struct {
 	brand        string
@@ -14,10 +14,18 @@ type brandMatch struct {
 	brands []*BrandName
 }
 
+func NewBrandMatch(brands []*BrandName) BrandMatch {
+	for _, b := range brands {
+		b.genMatch()
+	}
+	return &brandMatch{brands: brands}
+}
+
 // MatchAll 匹配所有的品牌并返回匹配信息
 // txt: 需要匹配的文本
 // products: 需要匹配的产品 每个元素都必须匹配 举例: []string{ "香水" ,"木质"}
 // properties: 属性 只需要匹配一个即可.有时候需要对产品制定属性 如背包 指定 []string{"双肩","通勤"}
+// MatchInfo: 匹配出来的信息
 func (bm *brandMatch) MatchAll(txt string, products []string, properties []string) []MatchInfo {
 	txt = strings.ToLower(txt)
 	mis := []MatchInfo{}
