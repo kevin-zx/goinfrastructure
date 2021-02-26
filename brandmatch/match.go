@@ -196,7 +196,7 @@ func matchBrandAndProduct(txt string, brand string, product string, productMinDi
 	txt = strings.ReplaceAll(txt, " ", "")
 	ts := strings.Split(txt, brand)
 	// log.Printf("%s\n", strings.Join(ts, "-----------"))
-	if len(ts) == 0 {
+	if len(ts) == 1 {
 		return false, false
 	}
 	brandMatch = false

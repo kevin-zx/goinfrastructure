@@ -98,6 +98,16 @@ func Test_BrandMatch_MatchAll(t *testing.T) {
 				// },
 			},
 		},
+		{
+			name: "just must product",
+			args: args{
+				txt:        "一个奇葩的bug",
+				products:   []string{"奇葩"},
+				properties: nil,
+				brandRaws:  []string{"unknown1", "unknown2", "角川"},
+			},
+			want: nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -113,7 +123,7 @@ func Test_BrandMatch_MatchAll(t *testing.T) {
 			bm := NewBrandMatch(bbns)
 			matchInfo := bm.MatchAll(test.args.txt, test.args.products, test.args.properties)
 			if !reflect.DeepEqual(matchInfo, test.want) {
-				t.Errorf("brandMatch.MatchAll() = %v, want %v", matchInfo, test.want)
+				t.Errorf("testName:%s brandMatch.MatchAll() = %v, want %v", test.name, matchInfo, test.want)
 			}
 		})
 	}
