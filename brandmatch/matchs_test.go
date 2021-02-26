@@ -1,6 +1,9 @@
 package brandmatch
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 var deafultText = `
 OOTD |爱上这条墨绿灰的直筒裤｜碾压Cos
@@ -23,6 +26,98 @@ OOTD |爱上这条墨绿灰的直筒裤｜碾压Cos
 这一身的衣服都已售罄，我再给你们推荐其它的哈！
 
 	`
+
+func Test_BrandMatch_MatchAll(t *testing.T) {
+	brandRaws := []string{"埃森/essen", "OOTD", "角川", "一身"}
+	type args struct {
+		txt        string
+		products   []string
+		properties []string
+		brandRaws  []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []MatchInfo
+	}{
+		{
+			name: "tm1",
+			args: args{
+				txt:        deafultText,
+				products:   []string{"这"},
+				properties: nil,
+				brandRaws:  brandRaws,
+			},
+			want: []MatchInfo{
+				{
+					Brand:        "OOTD",
+					ProductMatch: true,
+				},
+				{
+					Brand:        "一身",
+					ProductMatch: true,
+				},
+			},
+		},
+		{
+			// name: "brand match but product not match",
+			name: "single match",
+			args: args{
+				txt:        deafultText,
+				products:   []string{"博物"},
+				properties: nil,
+				brandRaws:  brandRaws,
+			},
+			want: []MatchInfo{
+				{
+					Brand:        "角川",
+					ProductMatch: true,
+				},
+				// {
+				// Brand:        "一身",
+				// ProductMatch: true,
+				// },
+			},
+		},
+		{
+			name: "brand match but product not match",
+			args: args{
+				txt:        deafultText,
+				products:   []string{"奇葩"},
+				properties: nil,
+				brandRaws:  []string{"unknown1", "unknown2", "角川"},
+			},
+			want: []MatchInfo{
+				{
+					Brand:        "角川",
+					ProductMatch: false,
+				},
+				// {
+				// Brand:        "一身",
+				// ProductMatch: true,
+				// },
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			bns, err := DecomposeBrands(test.args.brandRaws)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var bbns []*BrandName
+			for i := range bns {
+				bbns = append(bbns, &bns[i])
+			}
+			bm := NewBrandMatch(bbns)
+			matchInfo := bm.MatchAll(test.args.txt, test.args.products, test.args.properties)
+			if !reflect.DeepEqual(matchInfo, test.want) {
+				t.Errorf("brandMatch.MatchAll() = %v, want %v", matchInfo, test.want)
+			}
+		})
+	}
+}
 
 func Test_matchOneBrand(t *testing.T) {
 	type args struct {
@@ -92,6 +187,35 @@ func Test_matchOneBrand(t *testing.T) {
 			if got1 != test.want1 || got2 != test.want2 {
 				t.Logf("testName:%s want1: %t, want2:%t, got1:%t, got2:%t\n", test.name, test.want1, test.want2, got1, got2)
 				t.Fail()
+			}
+		})
+	}
+}
+
+func Test_brandMatch_MatchAll(t *testing.T) {
+	type fields struct {
+		brands []*BrandName
+	}
+	type args struct {
+		txt        string
+		products   []string
+		properties []string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   []MatchInfo
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bm := &brandMatch{
+				brands: tt.fields.brands,
+			}
+			if got := bm.MatchAll(tt.args.txt, tt.args.products, tt.args.properties); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("brandMatch.MatchAll() = %v, want %v", got, tt.want)
 			}
 		})
 	}
